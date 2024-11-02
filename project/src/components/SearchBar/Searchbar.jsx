@@ -1,20 +1,36 @@
-import data from "../../data";
 import { CiSearch } from "react-icons/ci";
 import { useDarkMode } from "../../context/DarkModeContext";
+import { useState } from "react";
+import data from "../../data";
 
-const Searchbar = () => {
+const Searchbar = ({ onSearch }) => {
   const { darkMode } = useDarkMode();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
 
   // Get unique regions for the dropdown
   const uniqueRegions = [...new Set(data.map((item) => item.region))];
 
+  // Handle input change for search term
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    onSearch(value, selectedRegion); // Call the onSearch function from App
+  };
+
+  // Handle change for region selection
+  const handleRegionChange = (event) => {
+    const value = event.target.value;
+    setSelectedRegion(value);
+    onSearch(searchTerm, value); // Call the onSearch function from App
+  };
+
   return (
     <div
-      className={`  flex justify-between items-center p-4 ${
+      className={`flex justify-between items-center p-4 ${
         darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-black"
       }`}
     >
-      {/* Search Input */}
       <label
         htmlFor="country"
         className={`inline-flex items-center p-3 w-2/6 rounded-lg shadow-md ${
@@ -30,6 +46,8 @@ const Searchbar = () => {
           name="country"
           id="country"
           placeholder="Search for a country..."
+          value={searchTerm}
+          onChange={handleInputChange} // Listen for changes
         />
       </label>
 
@@ -41,10 +59,10 @@ const Searchbar = () => {
           }`}
           name="region"
           id="region"
+          value={selectedRegion}
+          onChange={handleRegionChange} // Listen for region changes
         >
-          <option value="" disabled selected>
-            Filter by Region
-          </option>
+          <option value="">Filter by Region</option>
           {uniqueRegions.map((region) => (
             <option value={region} key={region}>
               {region}
